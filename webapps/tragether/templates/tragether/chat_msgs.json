@@ -1,0 +1,1 @@
+{"chat_msgs":[{% for chat_msg in chat_msgs %}{%spaceless%}{% include 'tragether/chat_msg.json' %}{%endspaceless%}{% if not forloop.last %}, {% endif %}{% endfor %}]}

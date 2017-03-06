@@ -1,0 +1,156 @@
+{% extends "tragether/base.html" %}
+
+{% block title %}
+User's Profile
+{% endblock %}
+
+{% block more_static %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'tragether/css/tragether.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default navbar-fixed-top">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Tragether</a>
+</div>
+<div id="navbar" class="navbar-collapse collapse">
+<ul class="nav navbar-nav">
+<li><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+<li><a href="{% url 'create_new_travel' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Travel</a></li>
+<li><a href="{% url 'my_travel' %}"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> My Travel</a></li>
+<li class="dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Messages <span id='unread_message' class="badge"></span></a>
+<ul class="dropdown-menu">
+<li><a href="{% url 'apply_unread_message' %}">Application</a></li>
+<li><a href="{% url 'invite_unread_message' %}">Invitation</a></li>
+</ul>
+</li>
+<li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Log out</a></li>
+</ul>
+</div>
+</div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container eldest-container">
+  <div class="col-xs-12 col-sm-9">
+    <div class="row">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+        <h3 class="panel-title">Created Travel</h3>
+        </div>
+        <div class="panel-body">
+           {% if travels %}
+         <table class="table">
+            <thead>
+              <tr>
+                <th>Destination</th>
+                  <th>Status</th>
+                <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Creator</th>
+              </tr>
+            </thead>
+            <tbody>
+             {% for travel in travels %}
+               <tr>
+               <td>{{ travel.destination }}</td>
+                {% if travel.status == '1' %}
+                        <td>Open</td>
+                    {% else %}
+                         <td>Close</td>
+                    {% endif %}
+               <td>{{ travel.start_time|date:"Y-m-d"}}</td>
+               <td>{{ travel.end_time| date:"Y-m-d"}}</td>
+               <td>{{ travel.creator }}</td>
+               </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+        </div>
+      </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+        <h3 class="panel-title">Involved Travel</h3>
+        </div>
+        <div class="panel-body">
+           {% if in_travels %}
+         <table class="table">
+            <thead>
+              <tr>
+                <th>Destination</th>
+                  <th>Status</th>
+                <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Creator</th>
+              </tr>
+            </thead>
+            <tbody>
+             {% for in_travel in in_travels %}
+               <tr>
+               <td>{{ in_travel.destination }}</td>
+                {% if in_travel.status == '1' %}
+                        <td>Open</td>
+                    {% else %}
+                         <td>Close</td>
+                    {% endif %}
+               <td>{{ in_travel.start_time|date:"Y-m-d"}}</td>
+               <td>{{ in_travel.end_time| date:"Y-m-d"}}</td>
+               <td>{{ in_travel.creator }}</td>
+               </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="col-xs-6 col-sm-3">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+        <h3 class="panel-title">{{ user_profile.user }}'s Profile</h3>
+        </div>
+       <div class="panel-body">
+          <img src="{{ user_profile.get_pic_url }}"  width="100px">
+        <br>
+        <br>
+      <p id="message">User Name: {{ user_profile.user.username }}</p>
+      <p id="message">First Name: {{ user_profile.user.first_name }}</p>
+      <p id="message">Last Name: {{ user_profile.user.last_name }}</p>
+      {% if user_profile.gender == 'F' %}
+      <p id="message">Gender: Female</p>
+      {% else %}
+      <p id="message">Gender: Male</p>
+      {% endif %}
+      {% if user_profile.age %}
+      <p id="message">Age: {{ user_profile.age }}</p>
+      {% else %}
+      <p id="message">Age: </p>
+      {% endif %}
+      <p id="message">Bio: {{ user_profile.bio }}</p>
+    </div>
+      </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"><\/script>')</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="{% static 'tragether/js/get_unread_message.js' %}" type="text/javascript"></script>
+{% endblock %}

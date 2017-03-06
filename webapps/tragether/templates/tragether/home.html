@@ -1,0 +1,144 @@
+{% extends "tragether/base.html" %}
+
+{% block title %}
+Homepage
+{% endblock %}
+
+{% block more_static %}
+{% load static %}
+<link href="{% static 'tragether/css/tragether.css' %}" rel="stylesheet">
+<link href="{% static 'tragether/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default navbar-fixed-top">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Tragether</a>
+</div>
+<div id="navbar" class="navbar-collapse collapse">
+<ul class="nav navbar-nav">
+<li class="active"><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+<li><a href="{% url 'create_new_travel' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Travel</a></li>
+<li><a href="{% url 'my_travel' %}"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> My Travel</a></li>
+<li class="dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Messages  <span id='unread_message' class="badge"></span></a>
+<ul class="dropdown-menu">
+<li><a href="{% url 'apply_unread_message' %}">Application</a></li>
+<li><a href="{% url 'invite_unread_message' %}">Invitation</a></li>
+</ul>
+</li>
+<li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Log out</a></li>
+</ul>
+</div>
+</div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container eldest-container">
+<div class="search-group-box">
+<div class="row">
+<div class="col-md-4 col-sm-4">
+</div>
+<div class="col-md-8 col-sm-8">
+{% for error in form_search_group.non_field_errors %}
+<p class="error">{{ error }}</p>
+{% endfor %}
+</div>
+</div>
+<div class="row">
+<form method="post" action="{% url 'home' %}" novalidate>
+<div class="col-md-4 col-sm-4">
+{{form_search_group.destination}}
+</div>
+<div class="col-md-6 col-sm-6">
+<div class="input-daterange input-group" id="datepicker">
+    <span class="input-group-addon">From</span>
+    {{form_search_group.start_time}}
+    <span class="input-group-addon-to input-group-addon">to</span>
+    {{form_search_group.end_time}}
+</div>
+</div>
+<div class="col-md-2 col-sm-2">
+<button class="btn btn-primary" type="submit">Search</button>
+</div>
+{% csrf_token %}
+</form>
+</div>
+
+<div class="row">
+<div class="col-md-4 col-sm-4">
+{{form_search_group.destination.errors}}
+</div>
+<div class="col-md-3 col-sm-4">
+{{form_search_group.start_time.errors}}
+</div>
+<div class="col-md-3 col-sm-4">
+{{form_search_group.end_time.errors}}
+</div>
+</div>
+</div>
+
+<div class="row">
+{% for travel_group in travel_groups %}
+<div class="col-md-6 col-sm-6">
+<div class="panel panel-default {{travel_group.destination}}">
+  <div class="panel-heading">
+    <h3 class="panel-title">Destination: {{ travel_group.destination }}  </h3>
+  </div>
+  <div class="panel-body">
+    <div class="pull-right">
+
+      {% if travel_group.creator == user  or user in travel_group.get_members %}
+        <a class="btn btn-success" role="button" href="{% url 'travel_group' pk=travel_group.pk %}">Enter</a>
+      {% else %}
+        {% if user in travel_group.get_applied_users %}
+          <div class="btn btn-warning disabled">Applied</div>
+        {% else %}
+          {% if user in travel_group.get_invited_users %}
+            <div class="btn btn-danger disabled">Invited</div>
+          {% else %}
+            {% if travel_group.status == '1' %}
+              <a class="btn btn-info" role="button" href="{% url 'apply_travel' pk=travel_group.pk %}">Apply</a>
+            {% else %}
+              <div class="btn btn-default disabled">Closed</div>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+
+    </div>
+      <div class="container">
+      <img src="" height="150" width="200">
+      </div>
+      <div class="container container-travel-info-all">
+        <p>Created by: <a href="{% url 'users_profile' user=travel_group.creator %}" >{{ travel_group.creator.username }}</a></p>
+        <p>Travel Date: {{ travel_group.start_time|date:"Y-m-d"}} to {{ travel_group.end_time| date:"Y-m-d"}}</p>
+        <p>Group Size: {{ travel_group.group_size }}</p>
+        <p>Budget: ${{ travel_group.budget }} per person</p>
+        <p>More Information: {{ travel_group.info }}</p>
+      </div>
+  </div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"><\/script>')</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="{% static 'tragether/js/bootstrap-datepicker.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'tragether/js/home.js' %}" type="text/javascript"></script>
+<script src="{% static 'tragether/js/get_unread_message.js' %}" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,1 @@
+{"id":{{itinerary.id}}, "latitude":{{itinerary.latitude}}, "longitude":{{itinerary.longitude}}, "deleted":{{itinerary.deleted|lower}}, "start_time":"{{itinerary.get_start_time|safe}}", "html":"{{itinerary.html|safe}}"}

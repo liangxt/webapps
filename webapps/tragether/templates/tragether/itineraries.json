@@ -1,0 +1,1 @@
+{"max-time":"{{max_time|date:"c"}}", "itineraries":[{% for itinerary in itineraries %}{%spaceless%}{% include 'tragether/itinerary.json' %}{%endspaceless%}{% if not forloop.last %}, {% endif %}{% endfor %}]}

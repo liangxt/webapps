@@ -1,0 +1,347 @@
+{% extends "tragether/base.html" %}
+
+{% block title %}
+Travel Group
+{% endblock %}
+
+{% block more_static %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'tragether/css/tragether.css' %}">
+<link rel="stylesheet" href="{% static 'tragether/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default navbar-fixed-top">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Tragether</a>
+</div>
+<div id="navbar" class="navbar-collapse collapse">
+<ul class="nav navbar-nav">
+<li><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+<li><a href="{% url 'create_new_travel' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Travel</a></li>
+<li><a href="{% url 'my_travel' %}"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> My Travel</a></li>
+<li class="dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Messages <span id='unread_message' class="badge"></span></a>
+<ul class="dropdown-menu">
+<li><a href="{% url 'apply_unread_message' %}">Application</a></li>
+<li><a href="{% url 'invite_unread_message' %}">Invitation</a></li>
+</ul>
+</li>
+<li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Log out</a></li>
+</ul>
+</div>
+</div>
+</nav>
+{#    <script>#}
+{#  (function() {#}
+{#    var cx = '004585602816542746031:dhsk8ow6qry';#}
+{#    var gcse = document.createElement('script');#}
+{#    gcse.type = 'text/javascript';#}
+{#    gcse.async = true;#}
+{#    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;#}
+{#    var s = document.getElementsByTagName('script')[0];#}
+{#    s.parentNode.insertBefore(gcse, s);#}
+{#  })();#}
+{#</script>#}
+{#<gcse:search></gcse:search>#}
+{% endblock %}
+
+{% block content %}
+<div class="container eldest-container travel-group-container">
+  <div class="jumbotron">
+    <div class="row">
+      <div class="col-md-5" id="group_img">
+      </div>
+      <div class="col-md-7">
+        <h3 id="destination">Destination: {{ travel.destination }} <span data-toggle="modal" data-target="#myModal-edit-travel"><a class="glyphicon glyphicon-pencil" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Edit Travel Profile"></a></span>
+            <span data-toggle="modal" data-target="#myModal-invite"><a class="glyphicon glyphicon-plus-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Invite Group Members"></a></span>
+            <span data-toggle="modal" data-target="#myModal-current-user"><a class="glyphicon glyphicon-user" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Current Group Member"></a></span></h3>
+          {% if travel.status == '1' %}
+            <p>Status: Open</p>
+          {% else %}
+            <p>Status: Close</p>
+          {% endif %}
+        <p>Travel Date: {{ travel.start_time|date:"Y-m-d" }} to {{ travel.end_time|date:"Y-m-d" }}</p>
+        <p>Group Size: {{ travel.group_size }}</p>
+        <p>Budget: ${{ travel.budget }} per person</p>
+        <p>More Info: {{ travel.info }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8 col-xs-11">
+    <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Vote for attraction</h3>
+        </div>
+        <div class="panel-body">
+           <div>
+               <form method="post" id="vote_form">
+                   <h2 id="travel_id" hidden>{{ travel.id }}</h2>
+                   {{ poll_form }}
+                   <p></p>
+                   <ul><button class="btn btn-sm btn-info" id="vote_button" type="submit">Vote</button></ul>
+                   <p class="error" id="error_message"></p>
+                    {% csrf_token %}
+                    </form>
+                    </div>
+                <p></p>
+
+            <p></p>
+
+
+            <div id="add-form">
+                <ul>
+              <form method="post" id="add_new_item" novalidate>
+                {{ add_form }}
+                <button type="submit"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                <p class="errorlist">{{ error_message }}</p>
+                {% csrf_token %}
+              </form>
+                    </ul>
+            </div>
+
+
+            <div ng-app="">
+            <ul><p class="messages"><input type="checkbox" ng-model="myResult"> Show Result <span class="glyphicon glyphicon-stats" aria-hidden="true"></span></p></ul>
+                    <div ng-show="myResult">
+                    <div id="result-bar">
+                     {% for attraction in attractions %}
+                        <div class="row">
+                        <div class='col-md-8'>
+                        <ul>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: {{ attraction.number }}%;">
+                            {{ attraction.name }} {{ attraction.number }}%</div>
+                        </div>
+                        </ul>
+                        </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                    </div>
+
+                </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8 col-xs-11">
+    <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title">Itinerary</h3>
+        </div>
+        <div class="panel-body panel-body-itinerary">
+          <div class="row">
+            <div class="col-md-10 col-xs-10">
+            {{form_itinerary.place}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-10 col-md-10">
+            <ul class='errorlist inline-error' id="itinerary-place-error"></ul>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-10 col-xs-10">
+            {{form_itinerary.start_time}}
+            </div>
+            <div class="col-md-2 col-xs-2">
+            <button class="btn btn-primary btn-itinerary-add" >Add</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-10 col-md-10">
+             <ul class='errorlist inline-error' id="itinerary-starttime-error"></ul>
+            </div>
+          </div>
+
+          <!-- itinerary display -->
+          <div class="row row-itinerary-display">
+            <div class="col-md-12">
+              <table class="table table-striped custab">
+                <thead>
+                  <tr>
+                    <th class="itinerary_col_1">Start time</th>
+                    <th class="itinerary_col_2">Place</th>
+                    <th class="itinerary_col_3">&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody id="table-itinerary-display">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="map" class="col-md-8 col-xs-11 container-map">
+  </div>
+
+  <div class="col-md-4 col-xs-11 container-chatbox">
+
+    <div class="panel panel-default panel-chatbox">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Chat box
+        <a id="minim_chat_window" class="glyphicon glyphicon-minus pull-right icon_minim"></a>
+        </h3>
+      </div>
+
+      <div class="panel-body" id="panel-body-chatbox">
+      </div>
+
+      <div class="panel-footer">
+        <ul class='errorlist inline-error' id="chatbox-error"></ul>
+        <div class="row">
+          <div class="col-md-9 col-xs-9 chatbox-input-container" id="{{ travel.id }}">
+          {{form_chatbox_messages.content}}
+          </div>
+          <div class="col-md-3 col-xs-3 chatbox-btn-container">
+          <button class="btn btn-primary btn-sm btn-chatbox">Send</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="modal fade" id="myModal-edit-travel" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form class="form-main" novalidate>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Travel Info</h4>
+        </div>
+        <div class="modal-body">
+          {{form_travel_edit}}
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="btn-travel-edit-submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal-edit-itinerary" role="dialog">   
+  <div class="modal-dialog">    
+    <div class="modal-content">   
+      <div class="modal-header">    
+        <button type="button" class="close" data-dismiss="modal">&times;</button>   
+        <h4 class="modal-title">Edit Itinerary</h4>   
+      </div>    
+      <div class="modal-body">    
+          <div class="row">   
+            <div class="col-md-10 col-xs-10">   
+            {{form_itinerary.place}}    
+            </div>    
+          </div>    
+          <div class="row">   
+            <div class="col-md-10 col-md-10">   
+            <ul class='errorlist inline-error' id="edit-itinerary-place-error"></ul>    
+            </div>    
+          </div>    
+          <div class="row">   
+            <div class="col-md-10 col-xs-10">   
+            {{form_itinerary.start_time}}   
+            </div>    
+          </div>    
+          <div class="row">   
+            <div class="col-md-10 col-md-10">   
+             <ul class='errorlist inline-error' id="edit-itinerary-starttime-error"></ul>   
+            </div>    
+          </div>    
+      </div>    
+      <div class="modal-footer">    
+        <button class="btn btn-primary btn-itinerary-edit-submit">Submit</button>    
+      </div>
+    </div>
+  </div>
+</div> 
+    
+
+<div class="modal fade" id="myModal-invite" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="invite-form" class="form-main" method="post" novalidate>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Invite Group Member</h4>
+      </div>
+      <div class="modal-body">
+        {{form_invite}}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">Submit</button>
+          <p class="error" id="invite_message"></p>
+      </div>
+      {% csrf_token %}
+      </form>
+    </div>
+  </div>
+</div>
+
+     <div class="modal fade bs-example-modal-sm" id="myModal-current-user" role="dialog">
+  <div class="modal-dialog modal-dialog modal-sm">
+    <div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Current Group Members</h4>
+      </div>
+     <div class="modal-body">
+     <div class="row">
+    <div class="col-md-3">
+      <img src="{{ creator.get_pic_url }}"  width="50px">
+    </div>
+      <div class="col-md-6"> <p id="message">Creator: <a href="{% url 'users_profile' user=travel.creator %}" >{{ creator.user }} </a></p></div>
+        </div>
+     <br>
+        {% for member in group_memebers %}
+            <div class="row">
+            <div class="col-md-3">
+             <img src="{{ member.get_pic_url }}"  width="50px">
+            </div>
+             <br>
+            <div class="col-md-6">
+             <a href="{% url 'users_profile' user=member.user %}" >{{ member.user }}</a>
+            </div>
+            </div>
+            <br>
+    {% endfor %}
+
+</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+{% load static %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"><\/script>')</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+<script src="{% static 'tragether/js/bootstrap-datetimepicker.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'tragether/js/travel_group.js' %}" type="text/javascript"></script>
+<script src="{% static 'tragether/js/search_photo.js' %}" type="text/javascript"></script>
+<script src="{% static 'tragether/js/get_unread_message.js' %}" type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmu4CagDfUgv3DqdH5ekTRy-UbQCA31QU&libraries=places&callback=myGoogleMap" async defer></script>
+{% endblock %}

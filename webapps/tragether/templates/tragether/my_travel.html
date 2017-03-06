@@ -1,0 +1,132 @@
+{% extends "tragether/base.html" %}
+
+{% block title %}
+My Travel
+{% endblock %}
+
+{% block more_static %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'tragether/css/tragether.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default navbar-fixed-top">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Tragether</a>
+</div>
+<div id="navbar" class="navbar-collapse collapse">
+<ul class="nav navbar-nav">
+<li><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+<li><a href="{% url 'create_new_travel' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Travel</a></li>
+<li class="active"><a href="{% url 'my_travel' %}"><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> My Travel</a></li>
+<li class="dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Messages <span id='unread_message' class="badge"></span></a>
+<ul class="dropdown-menu">
+<li><a href="{% url 'apply_unread_message' %}">Application</a></li>
+<li><a href="{% url 'invite_unread_message' %}">Invitation</a></li>
+</ul>
+</li>
+<li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Log out</a></li>
+</ul>
+</div>
+</div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container eldest-container">
+  <div class="col-xs-12 col-sm-9">
+    <div class="row">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+        <h3 class="panel-title">My Travel</h3>
+        </div>
+        <div class="panel-body">
+
+            {% for travel in travels %}
+                <div class="col-md-6">
+                    <h2 id="destination">{{ travel.destination }}</h2>
+                    {% if travel.status == '1' %}
+                        <p id="message">Status: Open</p>
+                    {% else %}
+                         <p id="message">Status: Close</p>
+                    {% endif %}
+                    <p id="message">Creator: {{ travel.creator.username }}</p>
+                    <p id="message">Travel Date: {{ travel.start_time|date:"Y-m-d"}} to {{ travel.end_time| date:"Y-m-d"}}</p>
+                    <p id="message">Group Size: {{ travel.group_size }}</p>
+                    <p id="message">Budget: ${{ travel.budget }} per person</p>
+                    <p id="message">More Information: {{ travel.info }}</p>
+                    <a id="message" class="btn btn-info" href="{% url 'travel_group' pk=travel.pk %}" role="button">View details &raquo;</a>
+                </div>
+            {% endfor %}
+        </div>
+      </div>
+
+     <div class="panel panel-info">
+        <div class="panel-heading">
+        <h3 class="panel-title">Involved Travel</h3>
+        </div>
+        <div class="panel-body">
+             {% for in_travel in in_travels %}
+                <div class="col-md-6">
+                    <h2 id="destination">{{ in_travel.destination }}</h2>
+                    {% if in_travel.status == '1' %}
+                        <p id="message">Status: Open</p>
+                    {% else %}
+                         <p id="message">Status: Close</p>
+                    {% endif %}
+                     <p id="message">Creator: {{ in_travel.creator.username }}</p>
+                    <p id="message">Travel Date: {{ in_travel.start_time|date:"Y-m-d" }} to {{ in_travel.end_time|date:"Y-m-d" }}</p>
+                    <p id="message">Group Size: {{ in_travel.group_size }}</p>
+                    <p id="message">Budget: ${{ in_travel.budget }} per person</p>
+                    <p id="message">More Information: {{ in_travel.info }}</p>
+                    <a class="btn btn-info" href="{% url 'travel_group' pk=in_travel.pk %}" role="button">View details &raquo;</a>
+                </div>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6 col-sm-3">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+        <h3 class="panel-title">My Profile</h3>
+        </div>
+        <div class="panel-body">
+             <img src="{{ profile.get_pic_url }}"  width="100px">
+          <p></p>
+          <p id="message">User Name: {{ profile.user.username }}</p>
+          <p id="message">First Name: {{ profile.user.first_name }}</p>
+          <p id="message">Last Name: {{ profile.user.last_name }}</p>
+            {% if profile.gender == 'F' %}
+                <p id="message">Gender: Female</p>
+            {% else %}
+                <p id="message">Gender: Male</p>
+            {% endif %}
+            {% if profile.age %}
+                <p id="message">Age: {{ profile.age }}</p>
+            {% else %}
+                <p id="message">Age: </p>
+            {% endif %}
+          <p id="message">Bio: {{ profile.bio }}</p>
+          <a  href="{% url 'edit_profile' %}" class="btn btn-info" role="button">Edit My Profile &raquo;</a>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_bottom %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"><\/script>')</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{% static 'tragether/js/get_unread_message.js' %}" type="text/javascript"></script>
+{% endblock %}

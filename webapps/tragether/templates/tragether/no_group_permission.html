@@ -1,0 +1,22 @@
+{% extends "tragether/base.html" %}
+
+{% block title %}
+No Permission
+{% endblock %}
+
+{% block more_static %}
+{% load static %}
+<link href="{% static 'tragether/css/no_permission.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<video muted loop autoplay id="bgvid">
+  <source src="{% static 'tragether/video/no_permission_video.mp4' %}">
+</video>
+<div id="polina">
+  <p>Sorry, you don't get permission to view the group page. Click the link below to apply for this travel.</p>
+  <p><a href="{% url 'apply_travel' pk=id %}">Apply for travel</a></p>
+</div>
+{% endblock %}
+
+
